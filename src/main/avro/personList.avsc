@@ -1,0 +1,22 @@
+{
+  "type": "record",
+  "name": "PersonList",
+  "namespace": "com.example.serialization.model",
+  "fields": [
+    {
+      "name": "persons",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "Person",
+          "fields": [
+            { "name": "id",   "type": "string" },
+            { "name": "name", "type": "string" },
+            { "name": "age",  "type": "int" }
+          ]
+        }
+      }
+    }
+  ]
+}
