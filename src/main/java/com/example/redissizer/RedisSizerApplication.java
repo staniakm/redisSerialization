@@ -73,7 +73,25 @@ public class RedisSizerApplication implements CommandLineRunner {
         serializerTest.testSerialization("avroKeyList", avroPpl, new AvroRedisSerializer<>(PersonList.class));
         logger.info("Avro Memory Usage: " + getMemoryUsage("avroKeyList") + " bytes");
 
+        com.example.redissizer.protobuf.Person protoPerson = com.example.redissizer.protobuf.Person.newBuilder().setId(person.getId())
+                .setName(person.getName())
+                .setAge(person.getAge()).build();
+        serializerTest.testSerialization("protoKey", protoPerson, new ProtobufRedisSerializer<>(com.example.redissizer.protobuf.Person.getDefaultInstance()));
+        logger.info("Proto Memory Usage: " + getMemoryUsage("protoKey") + " bytes");
+        var protoPpl = toProto(ppl);
+        serializerTest.testSerialization("protoKeyList", protoPpl, new ProtobufRedisSerializer<>(com.example.redissizer.protobuf.PersonList.getDefaultInstance()));
+        logger.info("Proto Memory Usage: " + getMemoryUsage("protoKeyList") + " bytes");
 
+
+    }
+
+    private com.example.redissizer.protobuf.PersonList toProto(List<PersonModel> ppl) {
+        var persons = com.example.redissizer.protobuf.PersonList.newBuilder();
+        ppl.stream().map(p -> com.example.redissizer.protobuf.Person.newBuilder().setId(p.getId())
+                        .setName(p.getName())
+                        .setAge(p.getAge()).build())
+                .forEach(persons::addPersons);
+        return persons.build();
     }
 
     private PersonList toAvro(List<PersonModel> ppl) {
