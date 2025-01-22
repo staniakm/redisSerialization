@@ -15,13 +15,14 @@ import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 
 @Slf4j
 @SpringBootApplication
 public class RedisSizerApplication implements CommandLineRunner {
-
+    private final Logger logger = Logger.getLogger("Main");
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -46,31 +47,33 @@ public class RedisSizerApplication implements CommandLineRunner {
 
         //  JSON
         serializerTest.testSerialization("jsonKey2", person, new GenericJackson2JsonRedisSerializer());
-        System.out.println("JSON Memory Usage: " + memoryUsage.getMemoryUsage("jsonKey2") + " bytes");
+        logger.info("JSON Memory Usage: " + memoryUsage.getMemoryUsage("jsonKey2") + " bytes");
 
         serializerTest.testSerialization("jsonKeyList", packedList, new GenericJackson2JsonRedisSerializer());
-        System.out.println("JSON Memory Usage: " + memoryUsage.getMemoryUsage("jsonKeyList") + " bytes");
+        logger.info("JSON Memory Usage: " + memoryUsage.getMemoryUsage("jsonKeyList") + " bytes");
 
         //  JDK
         serializerTest.testSerialization("jdkKey2", person, new JdkSerializationRedisSerializer());
-        System.out.println("JDK Memory Usage: " + getMemoryUsage("jdkKey2") + " bytes");
+        logger.info("JDK Memory Usage: " + getMemoryUsage("jdkKey2") + " bytes");
 
         serializerTest.testSerialization("jdkKeyList", packedList, new JdkSerializationRedisSerializer());
-        System.out.println("JDK Memory Usage: " + getMemoryUsage("jdkKeyList") + " bytes");
+        logger.info("JDK Memory Usage: " + getMemoryUsage("jdkKeyList") + " bytes");
 
         //  Kryo
         serializerTest.testSerialization("kryoKey", person, new KryoRedisSerializer<>(PersonModel.class));
-        System.out.println("Kryo Memory Usage: " + getMemoryUsage("kryoKey") + " bytes");
+        logger.info("Kryo Memory Usage: " + getMemoryUsage("kryoKey") + " bytes");
         serializerTest.testSerialization("kryoKeyList", packedList, new KryoRedisSerializer<>(KryoPersonList.class));
-        System.out.println("Kryo Memory Usage: " + getMemoryUsage("kryoKeyList") + " bytes");
+        logger.info("Kryo Memory Usage: " + getMemoryUsage("kryoKeyList") + " bytes");
 
         //   Avro
         var personAvro = new Person(person.getId(), person.getName(), person.getAge());
         serializerTest.testSerialization("avroKey", personAvro, new AvroRedisSerializer<>(Person.class));
-        System.out.println("Avro Memory Usage: " + getMemoryUsage("avroKey") + " bytes");
+        logger.info("Avro Memory Usage: " + getMemoryUsage("avroKey") + " bytes");
         var avroPpl = toAvro(ppl);
         serializerTest.testSerialization("avroKeyList", avroPpl, new AvroRedisSerializer<>(PersonList.class));
-        System.out.println("Avro Memory Usage: " + getMemoryUsage("avroKeyList") + " bytes");
+        logger.info("Avro Memory Usage: " + getMemoryUsage("avroKeyList") + " bytes");
+
+
     }
 
     private PersonList toAvro(List<PersonModel> ppl) {
